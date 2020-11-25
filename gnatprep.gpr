@@ -1,0 +1,33 @@
+project gnatprep is
+
+   for Create_Missing_Dirs use "True";
+
+   type Bar_Type is ("bar", "no_bar");
+   Bar : Bar_Type := external ("Bar");
+
+   type Foo_Type is ("foo", "no_foo");
+   Foo : Foo_Type := external ("Foo");
+
+   Amount := "";
+   case Foo is
+      when "foo" => Amount := "0.4";
+      when "no_foo" => Amount := external ("Amount");
+   end case;
+
+   -- the above approach also works for non-boolean options
+   -- type Guided_Type is ("noguided", "guided", "spacido", "excalibur");
+
+   for Source_Dirs use ("src",
+                        "src/" & Bar);
+   for Object_Dir use "obj/" & Bar & "_" & Foo & "_Amount" & Amount;
+
+   for Main use ("main.adb");
+
+   package Compiler is
+
+      for Switches ("Ada") use
+         ("-gnateDFoo=" & Foo,
+          "-gnateDAmount=" & Amount);
+   end Compiler;
+
+end gnatprep;
